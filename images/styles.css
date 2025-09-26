@@ -1,0 +1,180 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: #fafafa;
+}
+
+/* ШАПКА */
+.hero {
+    height: 80vh;
+    background: url('https://i.ibb.co/tPT8JxCn/002-07-05-2025.jpg') no-repeat center center/cover;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.8);
+}
+
+.hero p {
+    font-size: 1.4rem;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+}
+
+/* ОСНОВНОЕ ТЕЛО */
+.portfolios {
+    padding: 60px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.portfolio-category {
+    margin-bottom: 80px;
+}
+
+.portfolio-category h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #222;
+}
+
+.slider-container {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+.slider {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.slider img {
+    min-width: 100%;
+    height: 400px;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+/* СТРЕЛКИ */
+.slider-nav {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.slider-nav button {
+    background: rgba(255,255,255,0.8);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    transition: background 0.3s;
+}
+
+.slider-nav button:hover {
+    background: white;
+}
+
+/* ПАГИНАЦИЯ (ТОЧКИ) */
+.slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.slider-dots button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.slider-dots button.active {
+    background: #333;
+    border-color: #333;
+}
+
+/* ПОДВАЛ */
+.contact-footer {
+    background: #222;
+    color: #fff;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.contact-footer h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.contact-footer p {
+    margin: 10px 0;
+    font-size: 1.1rem;
+}
+
+.contact-footer a {
+    color: #4fc3f7;
+    text-decoration: none;
+}
+
+.contact-footer a:hover {
+    text-decoration: underline;
+}
+
+/* АДАПТИВНОСТЬ */
+@media (max-width: 768px) {
+    .hero h1 { font-size: 2.2rem; }
+    .hero p { font-size: 1.2rem; }
+    .slider img { height: 300px; }
+    .portfolios { padding: 40px 15px; }
+    .slider-nav button { width: 32px; height: 32px; font-size: 14px; }
+}

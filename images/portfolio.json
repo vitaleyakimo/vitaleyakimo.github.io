@@ -1,0 +1,71 @@
+{
+  "girls": {
+    "photos": [
+      { "url": "https://i.ibb.co/gZgNSQ2b/0001.webp", "alt": "Портрет девушки в студии, Рязань" },
+      { "url": "https://i.ibb.co/NdNjbt9N/0002.webp", "alt": "Фотосессия девушки на открытом воздухе, Рязань" },
+      { "url": "https://i.ibb.co/svSqJS70/0003.webp", "alt": "Элегантный женский портрет в естественном свете, Рязань" },
+      { "url": "https://i.ibb.co/3mN7k8JP/0004.webp", "alt": "Мягкий портрет с акцентом на глаза, Рязань" },
+      { "url": "https://i.ibb.co/Jjj4Q81n/0005.webp", "alt": "Девушка в повседневном образе, Рязань" },
+      { "url": "https://i.ibb.co/Fq0qt2H1/0006.webp", "alt": "Фотосессия в стиле бохо, Рязань" },
+      { "url": "https://i.ibb.co/cX7vPxgW/0007.webp", "alt": "Чёрно-белый женский портрет, Рязань" },
+      { "url": "https://i.ibb.co/mVp7jZkF/0008.webp", "alt": "Портрет с боковым освещением, Рязань" },
+      { "url": "https://i.ibb.co/8nBQYjHv/0009.webp", "alt": "Съёмка у окна с естественным светом, Рязань" },
+      { "url": "https://i.ibb.co/JwVC8NR9/0010.webp", "alt": "Летняя фотосессия в парке, Рязань" },
+      { "url": "https://i.ibb.co/XZCymJ6M/0011.webp", "alt": "Студийный портрет в нейтральных тонах, Рязань" },
+      { "url": "https://i.ibb.co/G3cWyDzn/0012.webp", "alt": "Фотосессия в светлом интерьере, Рязань" },
+      { "url": "https://i.ibb.co/hJVnhp5b/0013.webp", "alt": "Минималистичный студийный кадр, Рязань" },
+      { "url": "https://i.ibb.co/ksP6RF08/0014.webp", "alt": "Портрет с акцентом на волосы и профиль, Рязань" },
+      { "url": "https://i.ibb.co/RTj4nb2j/0015.webp", "alt": "Драматический свет и выразительный взгляд, Рязань" },
+      { "url": "https://i.ibb.co/27TGWjKn/0016.webp", "alt": "Фотосессия в стиле high fashion, Рязань" },
+      { "url": "https://i.ibb.co/m5NLVYR0/0017.webp", "alt": "Завершающий кадр студийной съёмки, Рязань" },
+      { "url": "https://i.ibb.co/392Sxj7h/0018.webp", "alt": "Портрет в тёплых тонах, Рязань" },
+      { "url": "https://i.ibb.co/v64K9MG6/0019.webp", "alt": "Съёмка с акцентом на текстуру и свет, Рязань" },
+      { "url": "https://i.ibb.co/3mQ45dsc/0020.webp", "alt": "Портрет в летнем настроении, Рязань" },
+      { "url": "https://i.ibb.co/PGBRxh2v/0021.webp", "alt": "Фотосессия в городском парке, Рязань" },
+      { "url": "https://i.ibb.co/23n59r0G/0022.webp", "alt": "Элегантный образ на фоне природы, Рязань" }
+    ]
+  },
+  "guys": {
+    "photos": [
+      { "url": "https://i.ibb.co/4RLNGLK5/0002.webp", "alt": "Портрет мужчины в студии, Рязань" },
+      { "url": "https://i.ibb.co/3yv7r1M8/0001.webp", "alt": "Фотосессия в casual-стиле, Рязань" },
+      { "url": "https://i.ibb.co/MyvKH1qG/0003.webp", "alt": "Портрет с драматическим боковым светом, Рязань" },
+      { "url": "https://i.ibb.co/k6MwqtW2/0004.webp", "alt": "Мужчина в студии с нейтральным фоном, Рязань" },
+      { "url": "https://i.ibb.co/HfNxhnrj/0005.webp", "alt": "Элегантный мужской образ в студийной съёмке, Рязань" },
+      { "url": "https://i.ibb.co/d0PyKZvd/0006.webp", "alt": "Весенняя уличная фотосессия мужчины, Рязань" },
+      { "url": "https://i.ibb.co/Ndx47mDR/0007.webp", "alt": "Летняя фотосессия в парке, Рязань" },
+      { "url": "https://i.ibb.co/Ldmm3SJg/0008.webp", "alt": "Минималистичный летний портрет, Рязань" },
+      { "url": "https://i.ibb.co/GQG3j2BP/0009.webp", "alt": "Портрет с акцентом на стиль и позу, Рязань" },
+      { "url": "https://i.ibb.co/ksyGHbzC/0010.webp", "alt": "Съёмка с естественным контровым светом, Рязань" },
+      { "url": "https://i.ibb.co/pBcq7BwB/0011.webp", "alt": "Летний образ в парковой зоне, Рязань" },
+      { "url": "https://i.ibb.co/SDLDd4sZ/0012.webp", "alt": "Студийный кадр с мягким светом, Рязань" },
+      { "url": "https://i.ibb.co/1tkbQ93R/0013.webp", "alt": "Завершающий кадр летней мужской съёмки, Рязань" },
+      { "url": "https://i.ibb.co/twfJxYQn/0014.webp", "alt": "Мужчина в casual-образе, Рязань" }
+    ]
+  },
+  "family": {
+    "photos": [
+      { "url": "https://i.ibb.co/x9V3cgL/0003.webp", "alt": "Семейная фотосессия в парке, Рязань" },
+      { "url": "https://i.ibb.co/6c49Bbn2/0001.webp", "alt": "Портрет семьи на фоне природы, Рязань" },
+      { "url": "https://i.ibb.co/JjvDKHJH/0004.webp", "alt": "Тёплая семейная съёмка с детьми, Рязань" },
+      { "url": "https://i.ibb.co/bj18K00F/0005.webp", "alt": "Семья у пруда в солнечный день, Рязань" },
+      { "url": "https://i.ibb.co/JwHc66K0/0009.webp", "alt": "Фотосессия родителей с малышом, Рязань" },
+      { "url": "https://i.ibb.co/yn4zbrYh/0011.webp", "alt": "Семейный портрет в естественном свете, Рязань" },
+      { "url": "https://i.ibb.co/PzM071bQ/0013.webp", "alt": "Игра и смех на семейной съёмке, Рязань" },
+      { "url": "https://i.ibb.co/cXMHLTYF/0014.webp", "alt": "Семья на летней прогулке, Рязань" },
+      { "url": "https://i.ibb.co/736VpR1/0016.webp", "alt": "Семейный портрет в парковой зоне, Рязань" },
+      { "url": "https://i.ibb.co/jvvhTjhm/0019.webp", "alt": "Фотосессия с детьми и родителями, Рязань" },
+      { "url": "https://i.ibb.co/d0QC9KQ9/0020.webp", "alt": "Летний семейный кадр в естественной обстановке, Рязань" },
+      { "url": "https://i.ibb.co/6R9yn6ws/0022.webp", "alt": "Семья в повседневной жизни, Рязань" },
+      { "url": "https://i.ibb.co/wrb5tgnc/0024.webp", "alt": "Семейная съёмка среди зелени, Рязань" },
+      { "url": "https://i.ibb.co/YTk8gtLk/0025.webp", "alt": "Трогательный момент между родителями и ребёнком, Рязань" },
+      { "url": "https://i.ibb.co/7Jr1d08x/0026.webp", "alt": "Семейная фотосессия в стиле lifestyle, Рязань" },
+      { "url": "https://i.ibb.co/tPvFwzY5/0028.webp", "alt": "Семья в летней одежде, Рязань" },
+      { "url": "https://i.ibb.co/v4vLbG6G/0030.webp", "alt": "Семья на фоне цветущих кустов, Рязань" },
+      { "url": "https://i.ibb.co/KpYt6ZY7/0031.webp", "alt": "Фотосессия с участием бабушек и дедушек, Рязань" },
+      { "url": "https://i.ibb.co/YBx8hYCH/0033.webp", "alt": "Семейный портрет в мягком утреннем свете, Рязань" },
+      { "url": "https://i.ibb.co/Mk7W303y/0035.webp", "alt": "Завершающий кадр летней семейной фотосессии, Рязань" }
+    ]
+  }
+}
+

@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <img src="${photos[0].url}" 
                              alt="${photos[0].alt}" 
                              loading="lazy" 
-                             decoding="async">
+                             decoding="async"
+							 fetchpriority="low">
                     </div>
                     <div class="slider-nav">
                         <button class="prev-btn">‹</button>

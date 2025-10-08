@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bv7v2.github.io/Site/sitemap.xml
+Sitemap: https://vitaleyakimo.github.io/sitemap.xml
+
+# Запрещаем индексацию служебных или несуществующих путей (если понадобится в будущем)
+# Disallow: /admin/
+# Disallow: /temp/

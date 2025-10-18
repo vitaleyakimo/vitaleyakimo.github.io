@@ -2,23 +2,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     const main = document.querySelector('.portfolios');
     if (!main) return;
 
+    // Карта перевода ключей категорий → человекочитаемые заголовки
+    // Добавляйте сюда новые категории по мере необходимости
+    const categoryTitles = {
+        girls: 'Девушки',
+        guys: 'Парни',
+        family: 'Семья',
+        studio: 'Студия',
+        weddings: 'Свадьбы',
+        portraits: 'Портреты'
+        // Можно добавить другие, или использовать fallback (см. ниже)
+    };
+
     try {
         const response = await fetch('images/portfolio.json');
         if (!response.ok) throw new Error('Не удалось загрузить portfolio.json');
         const data = await response.json();
 
-        const categories = [
-            { key: 'girls', title: 'Девушки' },
-            { key: 'guys', title: 'Парни' },
-            { key: 'family', title: 'Семья' }
-        ];
+        // Получаем все ключи из JSON, у которых есть photos — непустой массив
+        const autoCategories = Object.keys(data).filter(key => {
+            const cat = data[key];
+            return cat && Array.isArray(cat.photos) && cat.photos.length > 0;
+        });
+
+        // Преобразуем в массив объектов { key, title }
+        const categories = autoCategories.map(key => ({
+            key: key,
+            title: categoryTitles[key] || key.charAt(0).toUpperCase() + key.slice(1) // fallback: "studio" → "Studio"
+        }));
+
+        // Сортировка (опционально): можно задать порядок через массив приоритетов
+        // Например: ['girls', 'guys', 'studio', 'family']
+        // categories.sort((a, b) => autoCategories.indexOf(a.key) - autoCategories.indexOf(b.key));
 
         categories.forEach(cat => {
             const catData = data[cat.key];
-            if (!catData || !Array.isArray(catData.photos) || catData.photos.length === 0) {
-                return;
-            }
-
             const photos = catData.photos;
             let currentIndex = 0;
             const total = photos.length;
@@ -33,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                              alt="${photos[0].alt}" 
                              loading="lazy" 
                              decoding="async"
-							 fetchpriority="low">
+                             fetchpriority="low">
                     </div>
                     <div class="slider-nav">
                         <button class="prev-btn">‹</button>
@@ -48,7 +66,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const nextBtn = section.querySelector('.next-btn');
             const container = section.querySelector('.slider-container');
 
-            // Обновление изображения без пересоздания DOM
             const updateImage = () => {
                 sliderImg.src = photos[currentIndex].url;
                 sliderImg.alt = photos[currentIndex].alt;
@@ -56,7 +73,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 sliderImg.onerror = () => sliderImg.style.opacity = '0.4';
             };
 
-            // Навигация
             prevBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 currentIndex = (currentIndex - 1 + total) % total;
@@ -69,7 +85,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateImage();
             });
 
-            // Автопрокрутка
             let autoSlide = setInterval(() => {
                 currentIndex = (currentIndex + 1) % total;
                 updateImage();
@@ -84,7 +99,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 5000);
             });
 
-            // Открытие модального окна со всеми фото
             container.addEventListener('click', () => {
                 openModalSlider(photos, currentIndex);
             });
@@ -95,14 +109,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         main.innerHTML = '<p style="text-align:center; padding:40px; color:#555;">Не удалось загрузить портфолио. Обновите страницу.</p>';
     }
 
-    // === МОДАЛЬНЫЙ СЛАЙДЕР (загружает все фото при открытии) ===
+    // === МОДАЛЬНЫЙ СЛАЙДЕР ===
     function openModalSlider(photoList, startIndex) {
         const modal = document.getElementById('gallery-modal');
         const imgEl = document.getElementById('modal-img');
         const prevBtn = modal.querySelector('.modal-prev');
         const nextBtn = modal.querySelector('.modal-next');
         const closeBtn = document.getElementById('close-modal');
-
         let currentIndex = startIndex;
         const total = photoList.length;
 

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Запись на съёмку — Витале Якимо</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 20px; }
+        label { display: block; margin: 10px 0 5px; }
+        input, select, button { width: 100%; padding: 10px; margin-bottom: 15px; font-size: 16px; }
+        button { background: #4fc3f7; color: white; border: none; cursor: pointer; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        #result { margin-top: 15px; padding: 10px; text-align: center; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Записаться на съёмку</h1>
+    <form id="bookingForm">
+        <label for="clientName">Ваше имя:</label>
+        <input type="text" id="clientName" required>
+
+        <label for="slotSelect">Выберите дату и время:</label>
+        <select id="slotSelect" disabled>
+            <option value="">Загрузка...</option>
+        </select>
+
+        <button type="submit" id="bookBtn" disabled>Забронировать</button>
+    </form>
+    <div id="result"></div>
+
+    <p style="text-align: center; margin-top: 30px;">
+        <a href="/">← Вернуться на главную</a>
+    </p>
+
+    <script>
+        // === Замените на URL вашего Cloudflare Worker ===
+        const PROXY_URL = 'https://ваш-worker.ваш-subdomain.workers.dev';
+
+        const slotSelect = document.getElementById('slotSelect');
+        const bookBtn = document.getElementById('bookBtn');
+        const resultDiv = document.getElementById('result');
+
+        async function loadFreeSlots() {
+            try {
+                const res = await fetch(`${PROXY_URL}?action=getFreeSlots`);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Неизвестная ошибка');
+
+                slotSelect.innerHTML = '<option value="">Выберите слот</option>';
+                data.slots.forEach(slot => {
+                    const opt = document.createElement('option');
+                    opt.value = JSON.stringify({ date: slot.date, time: slot.time });
+                    opt.textContent = `${slot.date} в ${slot.time}`;
+                    slotSelect.appendChild(opt);
+                });
+                slotSelect.disabled = false;
+                bookBtn.disabled = false;
+            } catch (err) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = `Ошибка загрузки: ${err.message}`;
+            }
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('clientName').value.trim();
+            const slotValue = slotSelect.value;
+            if (!name || !slotValue) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = 'Заполните все поля';
+                return;
+            }
+
+            const slot = JSON.parse(slotValue);
+            try {
+                const res = await fetch(PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'bookSlot',
+                        date: slot.date,
+                        time: slot.time,
+                        name: name
+                    })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    resultDiv.className = 'success';
+                    resultDiv.textContent = '✅ Вы успешно записаны! Скоро с вами свяжутся.';
+                    slotSelect.disabled = true;
+                    bookBtn.disabled = true;
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = `❌ ${data.error || 'Не удалось забронировать'}`;
+                }
+            } catch (err) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = `❌ Ошибка: ${err.message}`;
+            }
+        });
+
+        loadFreeSlots();
+    </script>
+</body>
+</html>

@@ -7,7 +7,7 @@
     <meta name="description" content="Запишитесь на портретную или семейную фотосессию в Рязани онлайн. Выберите удобное время.">
     <link rel="canonical" href="https://vitaleyakimo.github.io/booking.html">
     <meta property="og:title" content="Запись на фотосессию — Витале Якимо">
-    <meta property="og:description" content="Выберите дату, время и длительность фотосъёмки.">
+    <meta property="og:description" content="Выберите дату и время для фотосъёмки в Рязани.">
     <meta property="og:image" content="https://i.ibb.co/JjvDKHJH/0004.webp">
     <meta property="og:url" content="https://vitaleyakimo.github.io/booking.html">
     <meta property="og:type" content="website">
@@ -89,8 +89,7 @@
             background: #f5f5f5;
             border-radius: 8px;
         }
-        .booking-form input,
-        .booking-form select {
+        .booking-form input {
             width: 100%;
             padding: 0.75rem;
             margin: 0.5rem 0;
@@ -124,7 +123,7 @@
         <div class="overlay"></div>
         <div class="hero-content">
             <h1>Запись на фотосессию</h1>
-            <p>Выберите дату, время и длительность</p>
+            <p>Выберите дату и время</p>
             <div class="hero-nav">
                 <a href="/" class="hero-nav-link">Портфолио</a>
                 <a href="/booking.html" class="hero-nav-link">Записаться</a>
@@ -143,13 +142,6 @@
             <form id="booking-form" class="booking-form">
                 <input type="text" id="client-name" placeholder="Ваше имя" required>
                 <input type="text" id="client-contact" placeholder="Телефон или Telegram" required>
-                <select id="duration-select" required>
-                    <option value="">Выберите длительность</option>
-                    <option value="30">30 минут</option>
-                    <option value="60">1 час</option>
-                    <option value="90">1 час 30 минут</option>
-                    <option value="120">2 часа</option>
-                </select>
                 <button type="submit">Забронировать</button>
                 <button type="button" class="cancel" onclick="cancelBooking()">Отмена</button>
             </form>
@@ -161,7 +153,7 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGVYU-iFtZ31qvP2ydqaOM0_3TpX5pl6JP6fNSzjGIe3mXYo1qaNSCihH911QB6k1A6Q/exec/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGVYU-iFtZ31qvP2ydqaOM0_3TpX5pl6JP6fNSzjGIe3mXYo1qaNSCihH911QB6k1A6Q/exec';
         let selectedSlot = null;
 
         function renderCalendar(slots) {
@@ -177,15 +169,13 @@
             // Группируем по дате
             const grouped = {};
             slots.forEach(slot => {
-                const key = `${slot.date}|${slot.start}`;
-                if (!grouped[slot.date]) grouped[slot.date] = new Set();
-                // Уникальность по времени начала
-                grouped[slot.date].add(slot.start);
+                if (!grouped[slot.date]) grouped[slot.date] = [];
+                grouped[slot.date].push(slot.time);
             });
 
-            // Преобразуем Set в массив
+            // Сортируем время внутри каждой даты
             for (const date in grouped) {
-                grouped[date] = Array.from(grouped[date]).sort((a, b) => {
+                grouped[date].sort((a, b) => {
                     const [h1, m1] = a.split(':').map(Number);
                     const [h2, m2] = b.split(':').map(Number);
                     return h1 * 60 + m1 - (h2 * 60 + m2);
@@ -219,8 +209,6 @@
                     const slotEl = document.createElement('div');
                     slotEl.className = 'slot';
                     slotEl.textContent = time;
-                    slotEl.dataset.date = date;
-                    slotEl.dataset.time = time;
                     slotEl.onclick = () => selectSlot({ date, time });
                     grid.appendChild(slotEl);
                 });
@@ -244,7 +232,6 @@
             document.getElementById('booking-form').style.display = 'none';
             document.getElementById('client-name').value = '';
             document.getElementById('client-contact').value = '';
-            document.getElementById('duration-select').value = '';
         }
 
         async function loadAvailableSlots() {
@@ -264,12 +251,6 @@
 
             const name = document.getElementById('client-name').value.trim();
             const contact = document.getElementById('client-contact').value.trim();
-            const duration = document.getElementById('duration-select').value;
-
-            if (!duration) {
-                alert('Выберите длительность съёмки');
-                return;
-            }
 
             try {
                 const formData = new URLSearchParams();
@@ -277,7 +258,6 @@
                 formData.append('time', selectedSlot.time);
                 formData.append('name', name);
                 formData.append('contact', contact);
-                formData.append('duration', duration);
 
                 const res = await fetch(SCRIPT_URL, {
                     method: 'POST',

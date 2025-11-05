@@ -219,37 +219,38 @@
         }
 
         document.getElementById('booking-form').onsubmit = async (e) => {
-            e.preventDefault();
-            if (!selectedSlot) return;
+  e.preventDefault();
+  if (!selectedSlot) return;
 
-            const name = document.getElementById('client-name').value.trim();
-            const contact = document.getElementById('client-contact').value.trim();
+  const name = document.getElementById('client-name').value.trim();
+  const contact = document.getElementById('client-contact').value.trim();
 
-            try {
-                const res = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        date: selectedSlot.date,
-                        time: selectedSlot.time,
-                        name: name,
-                        contact: contact
-                    })
-                });
-                const result = await res.json();
+  try {
+    const formData = new URLSearchParams();
+    formData.append('date', selectedSlot.date);
+    formData.append('time', selectedSlot.time);
+    formData.append('name', name);
+    formData.append('contact', contact);
 
-                if (result.success) {
-                    alert('✅ Бронь отправлена! Я свяжусь с вами для подтверждения.');
-                    loadAvailableSlots();
-                    cancelBooking();
-                } else {
-                    alert('❌ Слот уже занят. Пожалуйста, выберите другое время.');
-                }
-            } catch (e) {
-                alert('Ошибка при отправке. Попробуйте позже.');
-                console.error(e);
-            }
-        };
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+      alert('✅ Бронь отправлена! Я свяжусь с вами для подтверждения.');
+      loadAvailableSlots();
+      cancelBooking();
+    } else {
+      alert('❌ Слот уже занят. Пожалуйста, выберите другое время.');
+    }
+  } catch (e) {
+    alert('Ошибка при отправке: ' + e.message);
+    console.error(e);
+  }
+};
 
         loadAvailableSlots();
     </script>

@@ -6,49 +6,78 @@
     <title>Запись на фотосессию | Витале Якимо</title>
     <meta name="description" content="Запишитесь на портретную или семейную фотосессию в Рязани онлайн. Выберите удобное время.">
     <link rel="canonical" href="https://vitaleyakimo.github.io/booking.html">
-    <!-- Open Graph -->
     <meta property="og:title" content="Запись на фотосессию — Витале Якимо">
-    <meta property="og:description" content="Выберите дату, время и длительность фотосъёмки в Рязани.">
+    <meta property="og:description" content="Выберите дату и время для фотосъёмки в Рязани.">
     <meta property="og:image" content="https://i.ibb.co/JjvDKHJH/0004.webp">
     <meta property="og:url" content="https://vitaleyakimo.github.io/booking.html">
     <meta property="og:type" content="website">
-    <!-- Favicon -->
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
-    <!-- PWA Manifest -->
     <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="styles.css">
     <style>
         .booking-container {
-            max-width: 800px;
+            max-width: 1600px;
             margin: 2rem auto;
             padding: 0 1.5rem;
         }
-        #slots-grid {
+        /* Контейнер для календаря: до 6 дней в строке */
+        .calendar-grid {
             display: grid;
-            gap: 12px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
             margin-top: 1.5rem;
         }
-        /* Мобильные: 2 колонки */
-        @media (max-width: 767px) {
-            #slots-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+        @media (max-width: 1200px) {
+            .calendar-grid { grid-template-columns: repeat(4, 1fr); }
         }
-        /* Планшеты и ПК: 4 колонки */
-        @media (min-width: 768px) {
-            #slots-grid {
+        @media (max-width: 900px) {
+            .calendar-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .calendar-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Блок одного дня */
+        .day-block {
+            background: #fafafa;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            padding: 16px;
+        }
+        .day-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #1976d2;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .day-slots-grid {
+            display: grid;
+            gap: 8px;
+        }
+        @media (min-width: 900px) {
+            .day-slots-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
         }
+        @media (max-width: 899px) {
+            .day-slots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
         .slot {
-            padding: 0.75rem;
+            padding: 0.6rem;
             background: #f9f9f9;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             cursor: pointer;
             text-align: center;
-            font-size: 1rem;
-            transition: all 0.2s;
+            font-size: 0.95rem;
         }
         .slot:hover {
             background: #e3f2fd;
@@ -61,13 +90,12 @@
         }
         .booking-form {
             display: none;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             padding: 1.5rem;
             background: #f5f5f5;
             border-radius: 8px;
         }
-        .booking-form input,
-        .booking-form select {
+        .booking-form input {
             width: 100%;
             padding: 0.75rem;
             margin: 0.5rem 0;
@@ -92,6 +120,7 @@
             text-align: center;
             color: #666;
             margin: 1rem 0;
+            font-size: 1.2rem;
         }
     </style>
 </head>
@@ -100,7 +129,7 @@
         <div class="overlay"></div>
         <div class="hero-content">
             <h1>Запись на фотосессию</h1>
-            <p>Выберите дату, время и длительность</p>
+            <p>Выберите дату и время</p>
             <div class="hero-nav">
                 <a href="/" class="hero-nav-link">Портфолио</a>
                 <a href="/booking.html" class="hero-nav-link">Записаться</a>
@@ -114,18 +143,11 @@
     <main>
         <div class="booking-container">
             <div id="slots-message">Загрузка доступных слотов...</div>
-            <div id="slots-grid"></div>
+            <div id="calendar-container" class="calendar-grid"></div>
 
             <form id="booking-form" class="booking-form">
                 <input type="text" id="client-name" placeholder="Ваше имя" required>
                 <input type="text" id="client-contact" placeholder="Телефон или Telegram" required>
-                <select id="duration-select" required>
-                    <option value="">Выберите длительность</option>
-                    <option value="30">30 минут</option>
-                    <option value="60">1 час</option>
-                    <option value="90">1 час 30 минут</option>
-                    <option value="120">2 часа</option>
-                </select>
                 <button type="submit">Забронировать</button>
                 <button type="button" class="cancel" onclick="cancelBooking()">Отмена</button>
             </form>
@@ -137,34 +159,60 @@
     </footer>
 
     <script>
-        // 🔑 Обязательно укажите ваш АКТУАЛЬНЫЙ URL из Apps Script
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyOVrANCaRCrVxWwF939xswoiXCsSAg0o9fOZs00HBXtZEqDHyYTEE4QfF1LyAcTuuENA/exec';
-
         let selectedSlot = null;
 
-        function renderSlots(slots) {
-            const grid = document.getElementById('slots-grid');
+        function formatDateToReadable(dateStr) {
+            return new Date(dateStr).toLocaleDateString('ru-RU', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).replace(/г\.$/, '').trim();
+        }
+
+        function renderCalendar(slots) {
+            const container = document.getElementById('calendar-container');
             const msg = document.getElementById('slots-message');
 
             if (!Array.isArray(slots) || slots.length === 0) {
                 msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
-                grid.innerHTML = '';
+                container.innerHTML = '';
                 return;
             }
 
-            msg.textContent = 'Выберите время:';
-            grid.innerHTML = '';
-
+            // Группируем по дате
+            const grouped = {};
             slots.forEach(slot => {
-                const el = document.createElement('div');
-                el.className = 'slot';
-                el.textContent = slot.time;
-                el.title = `Дата: ${slot.date}`;
-                el.dataset.date = slot.date;
-                el.dataset.time = slot.time;
-                el.dataset.duration = slot.duration;
-                el.onclick = () => selectSlot(slot);
-                grid.appendChild(el);
+                if (!grouped[slot.date]) grouped[slot.date] = [];
+                grouped[slot.date].push(slot.time);
+            });
+
+            const sortedDates = Object.keys(grouped).sort();
+            container.innerHTML = '';
+
+            sortedDates.forEach(date => {
+                const dayBlock = document.createElement('div');
+                dayBlock.className = 'day-block';
+
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = formatDateToReadable(date);
+                dayBlock.appendChild(header);
+
+                const grid = document.createElement('div');
+                grid.className = 'day-slots-grid';
+
+                grouped[date].forEach(time => {
+                    const slotEl = document.createElement('div');
+                    slotEl.className = 'slot';
+                    slotEl.textContent = time;
+                    slotEl.onclick = () => selectSlot({ date, time });
+                    grid.appendChild(slotEl);
+                });
+
+                dayBlock.appendChild(grid);
+                container.appendChild(dayBlock);
             });
         }
 
@@ -181,16 +229,15 @@
             document.getElementById('booking-form').style.display = 'none';
             document.getElementById('client-name').value = '';
             document.getElementById('client-contact').value = '';
-            document.getElementById('duration-select').value = '';
         }
 
         async function loadAvailableSlots() {
             try {
                 const res = await fetch(SCRIPT_URL);
                 const slots = await res.json();
-                renderSlots(slots);
+                renderCalendar(slots);
             } catch (e) {
-                console.error('Ошибка загрузки слотов:', e);
+                console.error(e);
                 document.getElementById('slots-message').textContent = 'Не удалось загрузить слоты.';
             }
         }
@@ -201,12 +248,6 @@
 
             const name = document.getElementById('client-name').value.trim();
             const contact = document.getElementById('client-contact').value.trim();
-            const duration = document.getElementById('duration-select').value;
-
-            if (!duration) {
-                alert('Пожалуйста, выберите длительность съёмки.');
-                return;
-            }
 
             try {
                 const formData = new URLSearchParams();
@@ -214,7 +255,6 @@
                 formData.append('time', selectedSlot.time);
                 formData.append('name', name);
                 formData.append('contact', contact);
-                formData.append('duration', duration);
 
                 const res = await fetch(SCRIPT_URL, {
                     method: 'POST',

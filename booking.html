@@ -111,6 +111,21 @@
                 <button type="button" class="cancel" onclick="cancelBooking()">Отмена</button>
             </form>
         </div>
+
+        <!-- Подвал в стиле главной страницы -->
+        <section class="contact-footer" aria-labelledby="contact-heading" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee;">
+            <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Связаться</h2>
+            <p>📧 <a href="mailto:bv72006@ya.ru" style="color: #4fc3f7; text-decoration: none;">bv72006@ya.ru</a></p>
+            <p>📱 <a href="tel:+79194545542" style="color: #4fc3f7; text-decoration: none;">+7 (919) 454-55-42</a></p>
+            <p>💬 <a href="https://t.me/vyakimo" target="_blank" rel="noopener noreferrer" style="color: #4fc3f7; text-decoration: none;">Telegram (@vyakimo)</a></p>
+            <p>📍 Рязань, Россия</p>
+            <div class="footer-nav">
+                <a href="/" class="footer-nav-link">Портфолио</a>
+                <a href="/about.html" class="footer-nav-link">Обо мне</a>
+                <a href="/prices.html" class="footer-nav-link">Цены</a>
+                <a href="/reviews.html" class="footer-nav-link">Отзывы</a>
+            </div>
+        </section>
     </main>
 
     <footer role="contentinfo">
@@ -118,7 +133,6 @@
     </footer>
 
     <script>
-        // 🔑 ЗАМЕНИТЕ НА СВОЙ РЕАЛЬНЫЙ URL APPS SCRIPT!
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyJCQhvgSpM9uTzlX_mD0plJOZfS5vxOiPjKqXLMHGQ_Gulebmi93_1NGX53sPh0_gp/exec';
 
         let selectedSlot = null;
@@ -127,7 +141,7 @@
             const list = document.getElementById('slots-list');
             const msg = document.getElementById('slots-message');
 
-            if (!slots || slots.length === 0) {
+            if (!Array.isArray(slots) || slots.length === 0) {
                 msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
                 list.innerHTML = '';
                 return;
@@ -137,6 +151,7 @@
             list.innerHTML = '';
 
             slots.forEach(slot => {
+                if (!slot.date || !slot.time) return; // защита от битых данных
                 const el = document.createElement('div');
                 el.className = 'slot';
                 el.textContent = `${slot.date} в ${slot.time}`;
@@ -146,10 +161,8 @@
         }
 
         function selectSlot(slot) {
-            // Сброс предыдущего выбора
             document.querySelectorAll('.slot').forEach(el => el.classList.remove('selected'));
             event.currentTarget.classList.add('selected');
-            
             selectedSlot = slot;
             document.getElementById('booking-form').style.display = 'block';
         }
@@ -165,14 +178,19 @@
         async function loadAvailableSlots() {
             try {
                 const res = await fetch(SCRIPT_URL);
-                const slots = await res.json();
-                if (Array.isArray(slots)) {
-                    renderSlots(slots);
-                } else {
-                    document.getElementById('slots-message').textContent = 'Ошибка загрузки.';
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+
+                // Защита: если API вернул ошибку вместо массива
+                if (data && typeof data === 'object' && data.success === false) {
+                    console.error('API error:', data.error);
+                    document.getElementById('slots-message').textContent = 'Сервис временно недоступен.';
+                    return;
                 }
+
+                renderSlots(data);
             } catch (e) {
-                console.error(e);
+                console.error('Fetch error:', e);
                 document.getElementById('slots-message').textContent = 'Не удалось загрузить слоты.';
             }
         }
@@ -195,6 +213,7 @@
                         contact: contact
                     })
                 });
+
                 const result = await res.json();
 
                 if (result.success) {
@@ -210,7 +229,6 @@
             }
         };
 
-        // Загрузка при открытии страницы
         loadAvailableSlots();
     </script>
 </body>

@@ -8,7 +8,7 @@
     <link rel="canonical" href="https://vitaleyakimo.github.io/booking.html">
     <!-- Open Graph -->
     <meta property="og:title" content="Запись на фотосессию — Витале Якимо">
-    <meta property="og:description" content="Выберите дату и время для фотосъёмки в Рязани.">
+    <meta property="og:description" content="Выберите дату, время и длительность фотосъёмки в Рязани.">
     <meta property="og:image" content="https://i.ibb.co/JjvDKHJH/0004.webp">
     <meta property="og:url" content="https://vitaleyakimo.github.io/booking.html">
     <meta property="og:type" content="website">
@@ -23,35 +23,32 @@
             margin: 2rem auto;
             padding: 0 1.5rem;
         }
-        .calendar-day {
-            margin-bottom: 2rem;
-            padding: 1.2rem;
-            background: #fafafa;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-        .calendar-date-header {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            color: #1976d2;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e0e0e0;
-        }
-        .slots-grid {
+        #slots-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 0.75rem;
+            gap: 12px;
+            margin-top: 1.5rem;
+        }
+        /* Мобильные: 2 колонки */
+        @media (max-width: 767px) {
+            #slots-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        /* Планшеты и ПК: 4 колонки */
+        @media (min-width: 768px) {
+            #slots-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         .slot {
-            padding: 0.6rem;
-            text-align: center;
-            background: #ffffff;
-            border: 1px solid #ddd;
+            padding: 0.75rem;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
             border-radius: 6px;
             cursor: pointer;
+            text-align: center;
+            font-size: 1rem;
             transition: all 0.2s;
-            font-size: 0.95rem;
         }
         .slot:hover {
             background: #e3f2fd;
@@ -69,7 +66,8 @@
             background: #f5f5f5;
             border-radius: 8px;
         }
-        .booking-form input {
+        .booking-form input,
+        .booking-form select {
             width: 100%;
             padding: 0.75rem;
             margin: 0.5rem 0;
@@ -102,7 +100,7 @@
         <div class="overlay"></div>
         <div class="hero-content">
             <h1>Запись на фотосессию</h1>
-            <p>Выберите удобную дату и время</p>
+            <p>Выберите дату, время и длительность</p>
             <div class="hero-nav">
                 <a href="/" class="hero-nav-link">Портфолио</a>
                 <a href="/booking.html" class="hero-nav-link">Записаться</a>
@@ -116,11 +114,18 @@
     <main>
         <div class="booking-container">
             <div id="slots-message">Загрузка доступных слотов...</div>
-            <div id="calendar-container"></div>
+            <div id="slots-grid"></div>
 
             <form id="booking-form" class="booking-form">
                 <input type="text" id="client-name" placeholder="Ваше имя" required>
                 <input type="text" id="client-contact" placeholder="Телефон или Telegram" required>
+                <select id="duration-select" required>
+                    <option value="">Выберите длительность</option>
+                    <option value="30">30 минут</option>
+                    <option value="60">1 час</option>
+                    <option value="90">1 час 30 минут</option>
+                    <option value="120">2 часа</option>
+                </select>
                 <button type="submit">Забронировать</button>
                 <button type="button" class="cancel" onclick="cancelBooking()">Отмена</button>
             </form>
@@ -132,62 +137,34 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEZv4Xb2Im2pF1IE8VNZdBRxtBRtPeNIIoHdmbXdfHZIk_bExYeu2Zh-OygrbnQamk5Q/exec';
+        // 🔑 Обязательно укажите ваш АКТУАЛЬНЫЙ URL из Apps Script
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNHFp8Ke1UaGToJJIOLpN1DqpuqDIAbLbd0fRzrf-A8FMiMVXpCq72OHeFC-oqyzjX1w/exec';
+
         let selectedSlot = null;
 
-        // Форматирование даты в человекочитаемый вид: "Понедельник, 10 ноября 2025"
-        function formatDateToReadable(dateStr) {
-            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('ru-RU', options).replace(/г\.$/, '').replace(/\s+/g, ' ').trim();
-        }
-
-        function renderCalendar(slots) {
-            const container = document.getElementById('calendar-container');
-            const message = document.getElementById('slots-message');
+        function renderSlots(slots) {
+            const grid = document.getElementById('slots-grid');
+            const msg = document.getElementById('slots-message');
 
             if (!Array.isArray(slots) || slots.length === 0) {
-                message.textContent = 'Нет доступных слотов на ближайшие две недели.';
-                container.innerHTML = '';
+                msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
+                grid.innerHTML = '';
                 return;
             }
 
-            message.textContent = 'Выберите дату и время:';
+            msg.textContent = 'Выберите время:';
+            grid.innerHTML = '';
 
-            // Группируем слоты по дате
-            const grouped = {};
             slots.forEach(slot => {
-                if (!grouped[slot.date]) grouped[slot.date] = [];
-                grouped[slot.date].push(slot.time);
-            });
-
-            // Сортируем даты
-            const sortedDates = Object.keys(grouped).sort();
-
-            container.innerHTML = '';
-
-            sortedDates.forEach(date => {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'calendar-day';
-
-                const header = document.createElement('div');
-                header.className = 'calendar-date-header';
-                header.textContent = formatDateToReadable(date);
-                dayEl.appendChild(header);
-
-                const grid = document.createElement('div');
-                grid.className = 'slots-grid';
-
-                grouped[date].forEach(time => {
-                    const slotEl = document.createElement('div');
-                    slotEl.className = 'slot';
-                    slotEl.textContent = time;
-                    slotEl.onclick = () => selectSlot({ date, time });
-                    grid.appendChild(slotEl);
-                });
-
-                dayEl.appendChild(grid);
-                container.appendChild(dayEl);
+                const el = document.createElement('div');
+                el.className = 'slot';
+                el.textContent = slot.time;
+                el.title = `Дата: ${slot.date}`;
+                el.dataset.date = slot.date;
+                el.dataset.time = slot.time;
+                el.dataset.duration = slot.duration;
+                el.onclick = () => selectSlot(slot);
+                grid.appendChild(el);
             });
         }
 
@@ -204,53 +181,59 @@
             document.getElementById('booking-form').style.display = 'none';
             document.getElementById('client-name').value = '';
             document.getElementById('client-contact').value = '';
+            document.getElementById('duration-select').value = '';
         }
 
         async function loadAvailableSlots() {
             try {
                 const res = await fetch(SCRIPT_URL);
                 const slots = await res.json();
-                renderCalendar(slots);
+                renderSlots(slots);
             } catch (e) {
-                console.error(e);
+                console.error('Ошибка загрузки слотов:', e);
                 document.getElementById('slots-message').textContent = 'Не удалось загрузить слоты.';
-                document.getElementById('calendar-container').innerHTML = '';
             }
         }
 
         document.getElementById('booking-form').onsubmit = async (e) => {
-  e.preventDefault();
-  if (!selectedSlot) return;
+            e.preventDefault();
+            if (!selectedSlot) return;
 
-  const name = document.getElementById('client-name').value.trim();
-  const contact = document.getElementById('client-contact').value.trim();
+            const name = document.getElementById('client-name').value.trim();
+            const contact = document.getElementById('client-contact').value.trim();
+            const duration = document.getElementById('duration-select').value;
 
-  try {
-    const formData = new URLSearchParams();
-    formData.append('date', selectedSlot.date);
-    formData.append('time', selectedSlot.time);
-    formData.append('name', name);
-    formData.append('contact', contact);
+            if (!duration) {
+                alert('Пожалуйста, выберите длительность съёмки.');
+                return;
+            }
 
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      body: formData
-    });
+            try {
+                const formData = new URLSearchParams();
+                formData.append('date', selectedSlot.date);
+                formData.append('time', selectedSlot.time);
+                formData.append('name', name);
+                formData.append('contact', contact);
+                formData.append('duration', duration);
 
-    const result = await res.json();
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: formData
+                });
 
-    if (result.success) {
-      alert('✅ Бронь отправлена! Я свяжусь с вами для подтверждения.');
-      loadAvailableSlots();
-      cancelBooking();
-    } else {
-      alert('❌ Слот уже занят. Пожалуйста, выберите другое время.');
-    }
-  } catch (e) {
-    alert('Ошибка при отправке: ' + e.message);
-    console.error(e);
-  }
-};
+                const result = await res.json();
+                if (result.success) {
+                    alert('✅ Бронь отправлена! Я свяжусь с вами для подтверждения.');
+                    loadAvailableSlots();
+                    cancelBooking();
+                } else {
+                    alert('❌ Слот уже занят. Пожалуйста, выберите другое время.');
+                }
+            } catch (e) {
+                alert('Ошибка при отправке: ' + e.message);
+                console.error(e);
+            }
+        };
 
         loadAvailableSlots();
     </script>

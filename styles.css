@@ -294,3 +294,45 @@ body {
     .hero p { font-size: 1rem; }
     .slider { height: 250px; }
 }
+
+/* === Слоты бронирования — сетка времени === */
+.slots-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+/* Мобильные устройства: 2 колонки */
+@media (max-width: 767px) {
+  .slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Планшеты и ПК: 4 колонки */
+@media (min-width: 768px) {
+  .slots-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Стиль одного слота (уже есть, но для уверенности) */
+.slot {
+  padding: 0.75rem;
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+.slot:hover {
+  background: #e3f2fd;
+  border-color: #2196f3;
+}
+.slot.selected {
+  background: #bbdefb;
+  border-color: #1976d2;
+  font-weight: bold;
+}

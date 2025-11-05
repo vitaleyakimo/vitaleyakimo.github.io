@@ -3,37 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Админка — Бронирования</title>
+  <title>Админка — Бронирования | Витале Якимо</title>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    body { font-family: sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+    body { font-family: sans-serif; max-width: 1000px; margin: 2rem auto; padding: 0 1rem; background: #fff; }
+    .container { padding: 1.5rem; }
     table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    th, td { border: 1px solid #ddd; padding: 0.75rem; text-align: left; }
     .status-pending { color: #d9a700; }
     .status-confirmed { color: #52c41a; }
     .status-expired { color: #ff4d4f; }
-    button { margin: 0.25rem; padding: 0.3rem 0.6rem; cursor: pointer; }
-    .actions { white-space: nowrap; }
-    .cleanup { background: #fff1f0; padding: 1rem; margin: 1rem 0; }
+    button { margin: 0.25rem; padding: 0.4rem 0.8rem; cursor: pointer; border: none; border-radius: 4px; }
+    .btn-confirm { background: #e6f7ff; color: #1890ff; }
+    .btn-delete { background: #fff1f0; color: #ff4d4f; }
+    .cleanup { background: #f9f9f9; padding: 1rem; margin: 1.5rem 0; border-radius: 6px; }
+    input[type="password"] { padding: 0.5rem; margin-right: 0.5rem; width: 200px; }
   </style>
 </head>
 <body>
-  <h1>Админка: Управление бронированиями</h1>
+  <header class="hero" role="banner">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h1>Админка: Бронирования</h1>
+      <div class="hero-nav">
+        <a href="/" class="hero-nav-link">Портфолио</a>
+        <a href="/booking.html" class="hero-nav-link">Записаться</a>
+        <a href="/admin.html" class="hero-nav-link">Админка</a>
+      </div>
+    </div>
+  </header>
 
-  <div class="cleanup">
-    <p><strong>Очистка архива:</strong> Удалить все записи до вчерашнего числа (для уменьшения размера таблицы).</p>
-    <button onclick="cleanupOldBookings()">🗑️ Удалить старые записи</button>
-    <span id="cleanup-result"></span>
-  </div>
+  <main class="container">
+    <div class="cleanup">
+      <p><strong>Очистка архива:</strong> Удалить все записи до вчерашнего числа.</p>
+      <input type="password" id="cleanup-pass" placeholder="Пароль" />
+      <button onclick="cleanupOldBookings()">🗑️ Удалить старые записи</button>
+      <span id="cleanup-result"></span>
+    </div>
 
-  <div>
-    <label>Пароль: <input type="password" id="admin-pass" placeholder="Введите пароль" /></label>
-    <button onclick="loadBookings()">Загрузить бронирования</button>
-  </div>
+    <div>
+      <input type="password" id="admin-pass" placeholder="Пароль" />
+      <button onclick="loadBookings()">Загрузить бронирования</button>
+    </div>
 
-  <div id="bookings-list"></div>
+    <div id="bookings-list"></div>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2025 Витале Якимо. Все права защищены.</p>
+  </footer>
 
   <script>
-    // 🔑 ЗАМЕНИТЕ НА СВОЙ URL!
+    // 🔑 Укажите ваш РАБОЧИЙ URL из Apps Script (тот же, что и в booking.html)
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmBtQw2Y02bN5axJEHx2EzU3iWEfPOs_RrMYVC9OJcF5pPv1QA8beBLhrfeoD1lmQ6ow/exec';
 
     async function loadBookings() {
@@ -41,7 +62,8 @@
       if (!pass) { alert('Введите пароль'); return; }
 
       try {
-        const res = await fetch(`${SCRIPT_URL}?admin=${encodeURIComponent(pass)}`);
+        const url = `${SCRIPT_URL}?admin=${encodeURIComponent(pass)}`;
+        const res = await fetch(url);
         const data = await res.json();
 
         if (!data || data.success === false) {
@@ -76,10 +98,10 @@
               <td>${b.name}</td>
               <td>${b.contact}</td>
               <td class="${statusClass}">${b.status}</td>
-              <td class="actions">
+              <td>
                 ${b.status !== 'confirmed' ? 
-                  `<button onclick="confirmBooking('${b.id}', '${pass}')">✅ Подтвердить</button>` : ''}
-                <button onclick="deleteBooking('${b.id}', '${pass}')">🗑️ Удалить</button>
+                  `<button class="btn-confirm" onclick="confirmBooking('${b.id}', '${pass}')">✅ Подтвердить</button>` : ''}
+                <button class="btn-delete" onclick="deleteBooking('${b.id}', '${pass}')">🗑️ Удалить</button>
               </td>
             </tr>`;
         });
@@ -89,6 +111,31 @@
       } catch (e) {
         console.error(e);
         document.getElementById('bookings-list').innerHTML = '<p>Ошибка загрузки.</p>';
+      }
+    }
+
+    // === ОТПРАВКА БЕЗ JSON, ТОЛЬКО form-urlencoded ===
+    async function sendAdminAction(password, action, id) {
+      const formData = new URLSearchParams();
+      formData.append('admin', 'true');
+      formData.append('password', password);
+      formData.append('action', action);
+      if (id) formData.append('id', id);
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: formData  // ← без headers!
+        });
+        const result = await res.json();
+        if (!result.success) {
+          alert('Ошибка: ' + (result.error || 'неизвестно'));
+        }
+        return result;
+      } catch (e) {
+        console.error(e);
+        alert('Ошибка сети: ' + e.message);
+        throw e;
       }
     }
 
@@ -103,32 +150,30 @@
       loadBookings();
     }
 
-    async function sendAdminAction(password, action, id) {
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ admin: true, password, action, id })
-        });
-      } catch (e) { console.error(e); }
-    }
-
     async function cleanupOldBookings() {
-      const pass = document.getElementById('admin-pass').value;
+      const pass = document.getElementById('cleanup-pass').value;
       if (!pass) { alert('Введите пароль'); return; }
 
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ admin: true, password: pass, action: "cleanup" })
-      });
-      const result = await res.json();
+      const formData = new URLSearchParams();
+      formData.append('admin', 'true');
+      formData.append('password', pass);
+      formData.append('action', 'cleanup');
 
-      const el = document.getElementById('cleanup-result');
-      if (result.success) {
-        el.innerHTML = `✅ Удалено записей: ${result.deleted}`;
-      } else {
-        el.innerHTML = `❌ ${result.error}`;
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+        const el = document.getElementById('cleanup-result');
+        if (result.success) {
+          el.innerHTML = `✅ Удалено записей: ${result.deleted}`;
+        } else {
+          el.innerHTML = `❌ ${result.error || 'Ошибка'}`;
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById('cleanup-result').innerHTML = '❌ Ошибка сети';
       }
     }
   </script>

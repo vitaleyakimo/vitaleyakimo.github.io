@@ -7,7 +7,7 @@
     <meta name="description" content="Запишитесь на портретную или семейную фотосессию в Рязани онлайн. Выберите удобное время.">
     <link rel="canonical" href="https://vitaleyakimo.github.io/booking.html">
     <meta property="og:title" content="Запись на фотосессию — Витале Якимо">
-    <meta property="og:description" content="Выберите дату и время для фотосъёмки в Рязани.">
+    <meta property="og:description" content="Выберите дату, время и длительность фотосъёмки.">
     <meta property="og:image" content="https://i.ibb.co/JjvDKHJH/0004.webp">
     <meta property="og:url" content="https://vitaleyakimo.github.io/booking.html">
     <meta property="og:type" content="website">
@@ -20,32 +20,24 @@
             margin: 2rem auto;
             padding: 0 1.5rem;
         }
-        /* Контейнер для календаря: до 6 дней в строке */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             gap: 20px;
             margin-top: 1.5rem;
         }
-        @media (max-width: 1200px) {
-            .calendar-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (max-width: 900px) {
-            .calendar-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        @media (max-width: 768px) {
-            .calendar-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 500px) {
-            .calendar-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 1200px) { .calendar-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 900px)  { .calendar-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px)  { .calendar-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 500px)  { .calendar-grid { grid-template-columns: 1fr; } }
 
-        /* Блок одного дня */
         .day-block {
             background: #fafafa;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             padding: 16px;
+            display: flex;
+            flex-direction: column;
         }
         .day-header {
             font-size: 1.2rem;
@@ -55,20 +47,22 @@
             text-align: center;
             padding-bottom: 8px;
             border-bottom: 1px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+        .slots-scroll-container {
+            overflow-y: auto;
+            max-height: 320px;
+            flex-grow: 1;
         }
         .day-slots-grid {
             display: grid;
             gap: 8px;
         }
         @media (min-width: 900px) {
-            .day-slots-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
+            .day-slots-grid { grid-template-columns: repeat(4, 1fr); }
         }
         @media (max-width: 899px) {
-            .day-slots-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .day-slots-grid { grid-template-columns: repeat(2, 1fr); }
         }
         .slot {
             padding: 0.6rem;
@@ -95,7 +89,8 @@
             background: #f5f5f5;
             border-radius: 8px;
         }
-        .booking-form input {
+        .booking-form input,
+        .booking-form select {
             width: 100%;
             padding: 0.75rem;
             margin: 0.5rem 0;
@@ -122,49 +117,6 @@
             margin: 1rem 0;
             font-size: 1.2rem;
         }
-		/* Блок одного дня — фиксированная высота контента */
-.day-block {
-    background: #fafafa;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-}
-
-.day-header {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 12px;
-    color: #1976d2;
-    text-align: center;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e0e0e0;
-    flex-shrink: 0; /* Заголовок не сжимается */
-}
-
-/* Контейнер для слотов с прокруткой */
-.slots-scroll-container {
-    overflow-y: auto;
-    max-height: 300px; /* ~7 строк по 4 слота (при высоте ~40px на строку) */
-    flex-grow: 1;
-}
-
-/* Сетка слотов */
-.day-slots-grid {
-    display: grid;
-    gap: 8px;
-}
-@media (min-width: 900px) {
-    .day-slots-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-@media (max-width: 899px) {
-    .day-slots-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
     </style>
 </head>
 <body>
@@ -172,7 +124,7 @@
         <div class="overlay"></div>
         <div class="hero-content">
             <h1>Запись на фотосессию</h1>
-            <p>Выберите дату и время</p>
+            <p>Выберите дату, время и длительность</p>
             <div class="hero-nav">
                 <a href="/" class="hero-nav-link">Портфолио</a>
                 <a href="/booking.html" class="hero-nav-link">Записаться</a>
@@ -191,6 +143,13 @@
             <form id="booking-form" class="booking-form">
                 <input type="text" id="client-name" placeholder="Ваше имя" required>
                 <input type="text" id="client-contact" placeholder="Телефон или Telegram" required>
+                <select id="duration-select" required>
+                    <option value="">Выберите длительность</option>
+                    <option value="30">30 минут</option>
+                    <option value="60">1 час</option>
+                    <option value="90">1 час 30 минут</option>
+                    <option value="120">2 часа</option>
+                </select>
                 <button type="submit">Забронировать</button>
                 <button type="button" class="cancel" onclick="cancelBooking()">Отмена</button>
             </form>
@@ -202,71 +161,75 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtdBYrOd-qOK4NRMm9rA0ZVDM9qn2dFCO9nYghNlfU-14hQvJ8I1qlc80fQ6Kbm5h4zQ/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxGVYU-iFtZ31qvP2ydqaOM0_3TpX5pl6JP6fNSzjGIe3mXYo1qaNSCihH911QB6k1A6Q/exec/exec';
         let selectedSlot = null;
 
-        function formatDateToReadable(dateStr) {
-            return new Date(dateStr).toLocaleDateString('ru-RU', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            }).replace(/г\.$/, '').trim();
-        }
-
         function renderCalendar(slots) {
-			const container = document.getElementById('calendar-container');
-			const msg = document.getElementById('slots-message');
+            const container = document.getElementById('calendar-container');
+            const msg = document.getElementById('slots-message');
 
-			if (!Array.isArray(slots) || slots.length === 0) {
-				msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
-				container.innerHTML = '';
-				return;
-			}
+            if (!Array.isArray(slots) || slots.length === 0) {
+                msg.textContent = 'Нет доступных слотов.';
+                container.innerHTML = '';
+                return;
+            }
 
-			// Группируем слоты по дате
-			const grouped = {};
-			slots.forEach(slot => {
-				if (!grouped[slot.date]) grouped[slot.date] = [];
-				grouped[slot.date].push(slot.time);
-			});
+            // Группируем по дате
+            const grouped = {};
+            slots.forEach(slot => {
+                const key = `${slot.date}|${slot.start}`;
+                if (!grouped[slot.date]) grouped[slot.date] = new Set();
+                // Уникальность по времени начала
+                grouped[slot.date].add(slot.start);
+            });
 
-			const sortedDates = Object.keys(grouped).sort();
-			container.innerHTML = '';
+            // Преобразуем Set в массив
+            for (const date in grouped) {
+                grouped[date] = Array.from(grouped[date]).sort((a, b) => {
+                    const [h1, m1] = a.split(':').map(Number);
+                    const [h2, m2] = b.split(':').map(Number);
+                    return h1 * 60 + m1 - (h2 * 60 + m2);
+                });
+            }
 
-			sortedDates.forEach(date => {
-				const dayBlock = document.createElement('div');
-				dayBlock.className = 'day-block';
+            const sortedDates = Object.keys(grouped).sort();
+            container.innerHTML = '';
 
-				const header = document.createElement('div');
-				header.className = 'day-header';
-				header.textContent = new Date(date).toLocaleDateString('ru-RU', {
-					weekday: 'long',
-					day: 'numeric',
-					month: 'long',
-					year: 'numeric'
-				}).replace(/г\.$/, '').trim();
-				dayBlock.appendChild(header);
+            sortedDates.forEach(date => {
+                const dayBlock = document.createElement('div');
+                dayBlock.className = 'day-block';
 
-				const scrollContainer = document.createElement('div');
-				scrollContainer.className = 'slots-scroll-container';
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = new Date(date).toLocaleDateString('ru-RU', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                }).replace(/г\.$/, '').trim();
+                dayBlock.appendChild(header);
 
-				const grid = document.createElement('div');
-				grid.className = 'day-slots-grid';
+                const scrollContainer = document.createElement('div');
+                scrollContainer.className = 'slots-scroll-container';
 
-				grouped[date].forEach(time => {
-					const slotEl = document.createElement('div');
-					slotEl.className = 'slot';
-					slotEl.textContent = time;
-					slotEl.onclick = () => selectSlot({ date, time });
-					grid.appendChild(slotEl);
-				});
+                const grid = document.createElement('div');
+                grid.className = 'day-slots-grid';
 
-				scrollContainer.appendChild(grid);
-				dayBlock.appendChild(scrollContainer);
-				container.appendChild(dayBlock);
-			});
-		}
+                grouped[date].forEach(time => {
+                    const slotEl = document.createElement('div');
+                    slotEl.className = 'slot';
+                    slotEl.textContent = time;
+                    slotEl.dataset.date = date;
+                    slotEl.dataset.time = time;
+                    slotEl.onclick = () => selectSlot({ date, time });
+                    grid.appendChild(slotEl);
+                });
+
+                scrollContainer.appendChild(grid);
+                dayBlock.appendChild(scrollContainer);
+                container.appendChild(dayBlock);
+            });
+        }
 
         function selectSlot(slot) {
             document.querySelectorAll('.slot').forEach(el => el.classList.remove('selected'));
@@ -281,6 +244,7 @@
             document.getElementById('booking-form').style.display = 'none';
             document.getElementById('client-name').value = '';
             document.getElementById('client-contact').value = '';
+            document.getElementById('duration-select').value = '';
         }
 
         async function loadAvailableSlots() {
@@ -300,6 +264,12 @@
 
             const name = document.getElementById('client-name').value.trim();
             const contact = document.getElementById('client-contact').value.trim();
+            const duration = document.getElementById('duration-select').value;
+
+            if (!duration) {
+                alert('Выберите длительность съёмки');
+                return;
+            }
 
             try {
                 const formData = new URLSearchParams();
@@ -307,6 +277,7 @@
                 formData.append('time', selectedSlot.time);
                 formData.append('name', name);
                 formData.append('contact', contact);
+                formData.append('duration', duration);
 
                 const res = await fetch(SCRIPT_URL, {
                     method: 'POST',

@@ -23,18 +23,35 @@
             margin: 2rem auto;
             padding: 0 1.5rem;
         }
+        .calendar-day {
+            margin-bottom: 2rem;
+            padding: 1.2rem;
+            background: #fafafa;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .calendar-date-header {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #1976d2;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
         .slot {
-            display: block;
-            margin: 0.5rem 0;
-            padding: 0.75rem;
-            background: #f9f9f9;
-            border: 1px solid #e0e0e0;
+            padding: 0.6rem;
+            text-align: center;
+            background: #ffffff;
+            border: 1px solid #ddd;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            text-align: center;
-            text-decoration: none;
-            color: #333;
+            font-size: 0.95rem;
         }
         .slot:hover {
             background: #e3f2fd;
@@ -73,9 +90,6 @@
         .booking-form button.cancel {
             background: #9e9e9e;
         }
-        #slots-list {
-            margin-top: 1rem;
-        }
         #slots-message {
             text-align: center;
             color: #666;
@@ -102,7 +116,7 @@
     <main>
         <div class="booking-container">
             <div id="slots-message">Загрузка доступных слотов...</div>
-            <div id="slots-list"></div>
+            <div id="calendar-container"></div>
 
             <form id="booking-form" class="booking-form">
                 <input type="text" id="client-name" placeholder="Ваше имя" required>
@@ -111,21 +125,6 @@
                 <button type="button" class="cancel" onclick="cancelBooking()">Отмена</button>
             </form>
         </div>
-
-        <!-- Подвал в стиле главной страницы -->
-        <section class="contact-footer" aria-labelledby="contact-heading" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #eee;">
-            <h2 style="font-size: 1.8rem; margin-bottom: 20px;">Связаться</h2>
-            <p>📧 <a href="mailto:bv72006@ya.ru" style="color: #4fc3f7; text-decoration: none;">bv72006@ya.ru</a></p>
-            <p>📱 <a href="tel:+79194545542" style="color: #4fc3f7; text-decoration: none;">+7 (919) 454-55-42</a></p>
-            <p>💬 <a href="https://t.me/vyakimo" target="_blank" rel="noopener noreferrer" style="color: #4fc3f7; text-decoration: none;">Telegram (@vyakimo)</a></p>
-            <p>📍 Рязань, Россия</p>
-            <div class="footer-nav">
-                <a href="/" class="footer-nav-link">Портфолио</a>
-                <a href="/about.html" class="footer-nav-link">Обо мне</a>
-                <a href="/prices.html" class="footer-nav-link">Цены</a>
-                <a href="/reviews.html" class="footer-nav-link">Отзывы</a>
-            </div>
-        </section>
     </main>
 
     <footer role="contentinfo">
@@ -134,29 +133,61 @@
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzAvtiQCuo6iw2mmxI-lDbzctQTT_t7IvLVae8Tufm2NMrPNc7An6h_J5tYba6vgwljw/exec';
-
         let selectedSlot = null;
 
-        function renderSlots(slots) {
-            const list = document.getElementById('slots-list');
-            const msg = document.getElementById('slots-message');
+        // Форматирование даты в человекочитаемый вид: "Понедельник, 10 ноября 2025"
+        function formatDateToReadable(dateStr) {
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ru-RU', options).replace(/г\.$/, '').replace(/\s+/g, ' ').trim();
+        }
+
+        function renderCalendar(slots) {
+            const container = document.getElementById('calendar-container');
+            const message = document.getElementById('slots-message');
 
             if (!Array.isArray(slots) || slots.length === 0) {
-                msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
-                list.innerHTML = '';
+                message.textContent = 'Нет доступных слотов на ближайшие две недели.';
+                container.innerHTML = '';
                 return;
             }
 
-            msg.textContent = 'Выберите подходящее время:';
-            list.innerHTML = '';
+            message.textContent = 'Выберите дату и время:';
 
+            // Группируем слоты по дате
+            const grouped = {};
             slots.forEach(slot => {
-                if (!slot.date || !slot.time) return; // защита от битых данных
-                const el = document.createElement('div');
-                el.className = 'slot';
-                el.textContent = `${slot.date} в ${slot.time}`;
-                el.onclick = () => selectSlot(slot);
-                list.appendChild(el);
+                if (!grouped[slot.date]) grouped[slot.date] = [];
+                grouped[slot.date].push(slot.time);
+            });
+
+            // Сортируем даты
+            const sortedDates = Object.keys(grouped).sort();
+
+            container.innerHTML = '';
+
+            sortedDates.forEach(date => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+
+                const header = document.createElement('div');
+                header.className = 'calendar-date-header';
+                header.textContent = formatDateToReadable(date);
+                dayEl.appendChild(header);
+
+                const grid = document.createElement('div');
+                grid.className = 'slots-grid';
+
+                grouped[date].forEach(time => {
+                    const slotEl = document.createElement('div');
+                    slotEl.className = 'slot';
+                    slotEl.textContent = time;
+                    slotEl.onclick = () => selectSlot({ date, time });
+                    grid.appendChild(slotEl);
+                });
+
+                dayEl.appendChild(grid);
+                container.appendChild(dayEl);
             });
         }
 
@@ -178,20 +209,12 @@
         async function loadAvailableSlots() {
             try {
                 const res = await fetch(SCRIPT_URL);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-
-                // Защита: если API вернул ошибку вместо массива
-                if (data && typeof data === 'object' && data.success === false) {
-                    console.error('API error:', data.error);
-                    document.getElementById('slots-message').textContent = 'Сервис временно недоступен.';
-                    return;
-                }
-
-                renderSlots(data);
+                const slots = await res.json();
+                renderCalendar(slots);
             } catch (e) {
-                console.error('Fetch error:', e);
+                console.error(e);
                 document.getElementById('slots-message').textContent = 'Не удалось загрузить слоты.';
+                document.getElementById('calendar-container').innerHTML = '';
             }
         }
 
@@ -213,7 +236,6 @@
                         contact: contact
                     })
                 });
-
                 const result = await res.json();
 
                 if (result.success) {

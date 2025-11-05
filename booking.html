@@ -215,49 +215,58 @@
         }
 
         function renderCalendar(slots) {
-            const container = document.getElementById('calendar-container');
-            const msg = document.getElementById('slots-message');
+			const container = document.getElementById('calendar-container');
+			const msg = document.getElementById('slots-message');
 
-            if (!Array.isArray(slots) || slots.length === 0) {
-                msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
-                container.innerHTML = '';
-                return;
-            }
+			if (!Array.isArray(slots) || slots.length === 0) {
+				msg.textContent = 'Нет доступных слотов на ближайшие две недели.';
+				container.innerHTML = '';
+				return;
+			}
 
-            // Группируем по дате
-            const grouped = {};
-            slots.forEach(slot => {
-                if (!grouped[slot.date]) grouped[slot.date] = [];
-                grouped[slot.date].push(slot.time);
-            });
+			// Группируем слоты по дате
+			const grouped = {};
+			slots.forEach(slot => {
+				if (!grouped[slot.date]) grouped[slot.date] = [];
+				grouped[slot.date].push(slot.time);
+			});
 
-            const sortedDates = Object.keys(grouped).sort();
-            container.innerHTML = '';
+			const sortedDates = Object.keys(grouped).sort();
+			container.innerHTML = '';
 
-            sortedDates.forEach(date => {
-                const dayBlock = document.createElement('div');
-                dayBlock.className = 'day-block';
+			sortedDates.forEach(date => {
+				const dayBlock = document.createElement('div');
+				dayBlock.className = 'day-block';
 
-                const header = document.createElement('div');
-                header.className = 'day-header';
-                header.textContent = formatDateToReadable(date);
-                dayBlock.appendChild(header);
+				const header = document.createElement('div');
+				header.className = 'day-header';
+				header.textContent = new Date(date).toLocaleDateString('ru-RU', {
+					weekday: 'long',
+					day: 'numeric',
+					month: 'long',
+					year: 'numeric'
+				}).replace(/г\.$/, '').trim();
+				dayBlock.appendChild(header);
 
-                const grid = document.createElement('div');
-                grid.className = 'day-slots-grid';
+				const scrollContainer = document.createElement('div');
+				scrollContainer.className = 'slots-scroll-container';
 
-                grouped[date].forEach(time => {
-                    const slotEl = document.createElement('div');
-                    slotEl.className = 'slot';
-                    slotEl.textContent = time;
-                    slotEl.onclick = () => selectSlot({ date, time });
-                    grid.appendChild(slotEl);
-                });
+				const grid = document.createElement('div');
+				grid.className = 'day-slots-grid';
 
-                dayBlock.appendChild(grid);
-                container.appendChild(dayBlock);
-            });
-        }
+				grouped[date].forEach(time => {
+					const slotEl = document.createElement('div');
+					slotEl.className = 'slot';
+					slotEl.textContent = time;
+					slotEl.onclick = () => selectSlot({ date, time });
+					grid.appendChild(slotEl);
+				});
+
+				scrollContainer.appendChild(grid);
+				dayBlock.appendChild(scrollContainer);
+				container.appendChild(dayBlock);
+			});
+		}
 
         function selectSlot(slot) {
             document.querySelectorAll('.slot').forEach(el => el.classList.remove('selected'));
